@@ -1,0 +1,364 @@
+{
+  "$defs": {
+    "BootTarget": {
+      "properties": {
+        "arch": {
+          "$ref": "#/$defs/CpuArch"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "efi_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hidden": {
+          "default": false,
+          "type": "boolean"
+        },
+        "icon_hint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/BootTargetId"
+        },
+        "kernel_cmdline": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/BootTargetKind"
+        },
+        "os_family": {
+          "$ref": "#/$defs/OsFamily"
+        },
+        "partition_guid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "removable_media": {
+          "default": false,
+          "type": "boolean"
+        },
+        "verified_signature": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "display_name",
+        "os_family",
+        "kind",
+        "arch"
+      ],
+      "type": "object"
+    },
+    "BootTargetId": {
+      "description": "Stable, persistent identifier for a boot target (never derived from `/dev/sdX`).",
+      "type": "string"
+    },
+    "BootTargetKind": {
+      "enum": [
+        "efi_binary",
+        "bls_type1",
+        "bls_uki",
+        "sbm_core",
+        "apple_mac_os_reboot",
+        "firmware_setup"
+      ],
+      "type": "string"
+    },
+    "BootTimingMetrics": {
+      "properties": {
+        "firmware_init_us": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "first_frame_us": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "handoff_us": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "network_us": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "uefi_entry_us": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "uefi_entry_us",
+        "handoff_us"
+      ],
+      "type": "object"
+    },
+    "CpuArch": {
+      "enum": [
+        "x86_64",
+        "aarch64",
+        "ia32",
+        "riscv64"
+      ],
+      "type": "string"
+    },
+    "FirmwarePlatform": {
+      "enum": [
+        "uefi-native",
+        "uefi-uboot",
+        "apple-silicon-m1n1-uboot",
+        "legacy-bios"
+      ],
+      "type": "string"
+    },
+    "NetworkHandoffHint": {
+      "properties": {
+        "dhcp_acquired": {
+          "type": "boolean"
+        },
+        "link_up": {
+          "type": "boolean"
+        },
+        "server_reachable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "link_up",
+        "dhcp_acquired"
+      ],
+      "type": "object"
+    },
+    "OsFamily": {
+      "enum": [
+        "linux",
+        "windows",
+        "mac_os",
+        "bsd",
+        "recovery",
+        "firmware_utility",
+        "other"
+      ],
+      "type": "string"
+    },
+    "PlatformCapabilities": {
+      "properties": {
+        "arch": {
+          "$ref": "#/$defs/CpuArch"
+        },
+        "can_chainload_efi": {
+          "type": "boolean"
+        },
+        "can_direct_chainload_macos": {
+          "type": "boolean"
+        },
+        "external_usb_boot_supported": {
+          "type": "boolean"
+        },
+        "firmware": {
+          "$ref": "#/$defs/FirmwarePlatform"
+        },
+        "gop_framebuffer": {
+          "type": "boolean"
+        },
+        "nvram_writable": {
+          "type": "boolean"
+        },
+        "page_size_bytes": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "ram_total_mib": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "secure_boot_state": {
+          "$ref": "#/$defs/SecureBootState"
+        },
+        "tpm_present": {
+          "type": "boolean"
+        },
+        "uefi_networking": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "arch",
+        "firmware",
+        "page_size_bytes",
+        "secure_boot_state",
+        "tpm_present",
+        "nvram_writable",
+        "gop_framebuffer",
+        "uefi_networking",
+        "can_chainload_efi",
+        "can_direct_chainload_macos",
+        "external_usb_boot_supported"
+      ],
+      "type": "object"
+    },
+    "RecoveryLaunchMode": {
+      "oneOf": [
+        {
+          "properties": {
+            "mode": {
+              "const": "interactive",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "remote_assist",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "diagnostic_only",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "planned_operation",
+              "type": "string"
+            },
+            "plan_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode",
+            "plan_id"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "SecureBootState": {
+      "enum": [
+        "disabled",
+        "enabled",
+        "setup_mode",
+        "unsupported"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "attempt_id": {
+      "type": "string"
+    },
+    "boot_timing_us": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BootTimingMetrics"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "discovered_targets": {
+      "items": {
+        "$ref": "#/$defs/BootTarget"
+      },
+      "type": "array"
+    },
+    "launch_mode": {
+      "$ref": "#/$defs/RecoveryLaunchMode"
+    },
+    "network_hint": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NetworkHandoffHint"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pending_command_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "platform": {
+      "$ref": "#/$defs/PlatformCapabilities"
+    },
+    "sbm_uefi_version": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "attempt_id",
+    "sbm_uefi_version",
+    "platform",
+    "launch_mode",
+    "discovered_targets"
+  ],
+  "title": "EfiHandoffPayload",
+  "type": "object"
+}

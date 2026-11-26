@@ -1,0 +1,82 @@
+{
+  "$defs": {
+    "ComponentKind": {
+      "enum": [
+        "sbm-uefi",
+        "sbm-core-uki",
+        "sbm-core-sysext",
+        "sbm-as-bootstrap",
+        "sbm-installer",
+        "sbm-server",
+        "sbm-agent",
+        "sbm-catalog"
+      ],
+      "type": "string"
+    },
+    "SbmErrorCode": {
+      "enum": [
+        "invalid_schema",
+        "signature_invalid",
+        "replay_detected",
+        "command_expired",
+        "unauthorized_scope",
+        "protected_partition_blocked",
+        "disk_identity_mismatch",
+        "network_timeout",
+        "target_not_found",
+        "chainload_failed",
+        "incompatible_protocol_version",
+        "storage_io_error",
+        "unsupported_platform",
+        "internal_error"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "code": {
+      "$ref": "#/$defs/SbmErrorCode"
+    },
+    "component": {
+      "$ref": "#/$defs/ComponentKind"
+    },
+    "context": {
+      "default": [],
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "type": "array"
+      },
+      "type": "array"
+    },
+    "message": {
+      "type": "string"
+    },
+    "recoverable": {
+      "type": "boolean"
+    },
+    "remediation_hint": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "code",
+    "component",
+    "recoverable",
+    "message"
+  ],
+  "title": "SbmError",
+  "type": "object"
+}

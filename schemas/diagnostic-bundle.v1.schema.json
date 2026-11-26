@@ -1,0 +1,206 @@
+{
+  "$defs": {
+    "ComponentKind": {
+      "enum": [
+        "sbm-uefi",
+        "sbm-core-uki",
+        "sbm-core-sysext",
+        "sbm-as-bootstrap",
+        "sbm-installer",
+        "sbm-server",
+        "sbm-agent",
+        "sbm-catalog"
+      ],
+      "type": "string"
+    },
+    "CpuArch": {
+      "enum": [
+        "x86_64",
+        "aarch64",
+        "ia32",
+        "riscv64"
+      ],
+      "type": "string"
+    },
+    "FirmwarePlatform": {
+      "enum": [
+        "uefi-native",
+        "uefi-uboot",
+        "apple-silicon-m1n1-uboot",
+        "legacy-bios"
+      ],
+      "type": "string"
+    },
+    "PlatformCapabilities": {
+      "properties": {
+        "arch": {
+          "$ref": "#/$defs/CpuArch"
+        },
+        "can_chainload_efi": {
+          "type": "boolean"
+        },
+        "can_direct_chainload_macos": {
+          "type": "boolean"
+        },
+        "external_usb_boot_supported": {
+          "type": "boolean"
+        },
+        "firmware": {
+          "$ref": "#/$defs/FirmwarePlatform"
+        },
+        "gop_framebuffer": {
+          "type": "boolean"
+        },
+        "nvram_writable": {
+          "type": "boolean"
+        },
+        "page_size_bytes": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "ram_total_mib": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "secure_boot_state": {
+          "$ref": "#/$defs/SecureBootState"
+        },
+        "tpm_present": {
+          "type": "boolean"
+        },
+        "uefi_networking": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "arch",
+        "firmware",
+        "page_size_bytes",
+        "secure_boot_state",
+        "tpm_present",
+        "nvram_writable",
+        "gop_framebuffer",
+        "uefi_networking",
+        "can_chainload_efi",
+        "can_direct_chainload_macos",
+        "external_usb_boot_supported"
+      ],
+      "type": "object"
+    },
+    "SbmError": {
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/SbmErrorCode"
+        },
+        "component": {
+          "$ref": "#/$defs/ComponentKind"
+        },
+        "context": {
+          "default": [],
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "message": {
+          "type": "string"
+        },
+        "recoverable": {
+          "type": "boolean"
+        },
+        "remediation_hint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "component",
+        "recoverable",
+        "message"
+      ],
+      "type": "object"
+    },
+    "SbmErrorCode": {
+      "enum": [
+        "invalid_schema",
+        "signature_invalid",
+        "replay_detected",
+        "command_expired",
+        "unauthorized_scope",
+        "protected_partition_blocked",
+        "disk_identity_mismatch",
+        "network_timeout",
+        "target_not_found",
+        "chainload_failed",
+        "incompatible_protocol_version",
+        "storage_io_error",
+        "unsupported_platform",
+        "internal_error"
+      ],
+      "type": "string"
+    },
+    "SecureBootState": {
+      "enum": [
+        "disabled",
+        "enabled",
+        "setup_mode",
+        "unsupported"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "errors": {
+      "items": {
+        "$ref": "#/$defs/SbmError"
+      },
+      "type": "array"
+    },
+    "generated_at_unix": {
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "platform": {
+      "$ref": "#/$defs/PlatformCapabilities"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "platform",
+    "errors",
+    "notes"
+  ],
+  "title": "DiagnosticBundle",
+  "type": "object"
+}

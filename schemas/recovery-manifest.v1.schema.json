@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "RecoverySlotDescriptor": {
+      "properties": {
+        "healthy": {
+          "type": "boolean"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "slot_name": {
+          "type": "string"
+        },
+        "uki_efi_path": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_name",
+        "uki_efi_path",
+        "sha256",
+        "version",
+        "healthy"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "active_slot": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "slots": {
+      "items": {
+        "$ref": "#/$defs/RecoverySlotDescriptor"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "active_slot",
+    "slots"
+  ],
+  "title": "RecoveryManifest",
+  "type": "object"
+}

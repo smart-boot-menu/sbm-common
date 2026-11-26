@@ -1,0 +1,45 @@
+{
+  "$defs": {
+    "AuthScope": {
+      "enum": [
+        "read_only",
+        "boot_select",
+        "recovery_access",
+        "os_install",
+        "storage_destructive",
+        "admin"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "client_cert_pem": {
+      "type": "string"
+    },
+    "device_id": {
+      "type": "string"
+    },
+    "granted_scopes": {
+      "items": {
+        "$ref": "#/$defs/AuthScope"
+      },
+      "type": "array"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "server_command_verify_key_ed25519_hex": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "device_id",
+    "client_cert_pem",
+    "server_command_verify_key_ed25519_hex",
+    "granted_scopes"
+  ],
+  "title": "EnrollmentResponse",
+  "type": "object"
+}

@@ -1,0 +1,60 @@
+{
+  "$defs": {
+    "BootAttemptStatus": {
+      "enum": [
+        "started",
+        "confirmed",
+        "failed",
+        "rolled_back"
+      ],
+      "type": "string"
+    },
+    "BootTargetId": {
+      "description": "Stable, persistent identifier for a boot target (never derived from `/dev/sdX`).",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "attempt_id": {
+      "type": "string"
+    },
+    "consecutive_failures": {
+      "format": "uint8",
+      "maximum": 255,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "slot": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "$ref": "#/$defs/BootAttemptStatus"
+    },
+    "target_id": {
+      "$ref": "#/$defs/BootTargetId"
+    },
+    "timestamp_unix": {
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "attempt_id",
+    "target_id",
+    "consecutive_failures",
+    "status"
+  ],
+  "title": "BootAttemptRecord",
+  "type": "object"
+}

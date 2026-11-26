@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "BootTargetId": {
+      "description": "Stable, persistent identifier for a boot target (never derived from `/dev/sdX`).",
+      "type": "string"
+    },
+    "BootTargetKind": {
+      "enum": [
+        "efi_binary",
+        "bls_type1",
+        "bls_uki",
+        "sbm_core",
+        "apple_mac_os_reboot",
+        "firmware_setup"
+      ],
+      "type": "string"
+    },
+    "CpuArch": {
+      "enum": [
+        "x86_64",
+        "aarch64",
+        "ia32",
+        "riscv64"
+      ],
+      "type": "string"
+    },
+    "OsFamily": {
+      "enum": [
+        "linux",
+        "windows",
+        "mac_os",
+        "bsd",
+        "recovery",
+        "firmware_utility",
+        "other"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "arch": {
+      "$ref": "#/$defs/CpuArch"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "efi_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hidden": {
+      "default": false,
+      "type": "boolean"
+    },
+    "icon_hint": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "$ref": "#/$defs/BootTargetId"
+    },
+    "kernel_cmdline": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "kind": {
+      "$ref": "#/$defs/BootTargetKind"
+    },
+    "os_family": {
+      "$ref": "#/$defs/OsFamily"
+    },
+    "partition_guid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "removable_media": {
+      "default": false,
+      "type": "boolean"
+    },
+    "verified_signature": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "display_name",
+    "os_family",
+    "kind",
+    "arch"
+  ],
+  "title": "BootTarget",
+  "type": "object"
+}

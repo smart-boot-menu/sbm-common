@@ -1,0 +1,668 @@
+{
+  "$defs": {
+    "AuthScope": {
+      "enum": [
+        "read_only",
+        "boot_select",
+        "recovery_access",
+        "os_install",
+        "storage_destructive",
+        "admin"
+      ],
+      "type": "string"
+    },
+    "BootCommand": {
+      "oneOf": [
+        {
+          "properties": {
+            "action": {
+              "const": "boot_target",
+              "type": "string"
+            },
+            "extra_cmdline_preset": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "one_shot": {
+              "type": "boolean"
+            },
+            "target_id": {
+              "$ref": "#/$defs/BootTargetId"
+            }
+          },
+          "required": [
+            "action",
+            "target_id",
+            "one_shot"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "boot_recovery",
+              "type": "string"
+            },
+            "launch_mode": {
+              "$ref": "#/$defs/RecoveryLaunchMode"
+            },
+            "slot": {
+              "$ref": "#/$defs/RecoverySlotPreference"
+            }
+          },
+          "required": [
+            "action",
+            "slot",
+            "launch_mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "reboot_to_firmware_setup",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "reboot",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "shutdown",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "BootRegistrationPlan": {
+      "properties": {
+        "display_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "register_bls_or_efi": {
+          "type": "boolean"
+        },
+        "set_as_default": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "register_bls_or_efi",
+        "set_as_default"
+      ],
+      "type": "object"
+    },
+    "BootTargetId": {
+      "description": "Stable, persistent identifier for a boot target (never derived from `/dev/sdX`).",
+      "type": "string"
+    },
+    "CommandPayload": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/BootCommand",
+          "properties": {
+            "kind": {
+              "const": "boot",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "$ref": "#/$defs/StorageOperationPlan",
+          "properties": {
+            "kind": {
+              "const": "run_storage_plan",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "$ref": "#/$defs/OsInstallPlan",
+          "properties": {
+            "kind": {
+              "const": "run_os_install",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "revoke_enrollment",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "CpuArch": {
+      "enum": [
+        "x86_64",
+        "aarch64",
+        "ia32",
+        "riscv64"
+      ],
+      "type": "string"
+    },
+    "DiskBus": {
+      "enum": [
+        "nvme",
+        "sata",
+        "usb",
+        "virtio",
+        "scsi",
+        "mmc",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "DiskIdentity": {
+      "properties": {
+        "bus": {
+          "$ref": "#/$defs/DiskBus"
+        },
+        "gpt_disk_guid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "logical_sector_size": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "model": {
+          "type": "string"
+        },
+        "read_only": {
+          "default": false,
+          "type": "boolean"
+        },
+        "removable": {
+          "default": false,
+          "type": "boolean"
+        },
+        "serial_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "stable_id": {
+          "type": "string"
+        },
+        "wwn_or_eui64": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "stable_id",
+        "model",
+        "size_bytes",
+        "logical_sector_size",
+        "bus"
+      ],
+      "type": "object"
+    },
+    "InstallStrategy": {
+      "enum": [
+        "direct_installer_boot",
+        "rootfs_image_extract",
+        "bootc_oci",
+        "windows_wim_apply",
+        "bsd_image"
+      ],
+      "type": "string"
+    },
+    "OsInstallPlan": {
+      "properties": {
+        "artifact_verification": {
+          "items": {
+            "$ref": "#/$defs/VerifiedArtifactRef"
+          },
+          "type": "array"
+        },
+        "boot_registration": {
+          "$ref": "#/$defs/BootRegistrationPlan"
+        },
+        "catalog_entry_id": {
+          "type": "string"
+        },
+        "catalog_release_version": {
+          "type": "string"
+        },
+        "offline_media_only": {
+          "default": false,
+          "type": "boolean"
+        },
+        "plan_id": {
+          "type": "string"
+        },
+        "schema_version": {
+          "type": "string"
+        },
+        "storage_plan": {
+          "$ref": "#/$defs/StorageOperationPlan"
+        },
+        "strategy": {
+          "$ref": "#/$defs/InstallStrategy"
+        },
+        "target_arch": {
+          "$ref": "#/$defs/CpuArch"
+        }
+      },
+      "required": [
+        "schema_version",
+        "plan_id",
+        "catalog_entry_id",
+        "catalog_release_version",
+        "target_arch",
+        "strategy",
+        "artifact_verification",
+        "storage_plan",
+        "boot_registration"
+      ],
+      "type": "object"
+    },
+    "PartitionProtectionClass": {
+      "enum": [
+        "normal",
+        "protected_esp",
+        "protected_apple_system",
+        "protected_encrypted",
+        "protected_sbm_recovery"
+      ],
+      "type": "string"
+    },
+    "RecoveryLaunchMode": {
+      "oneOf": [
+        {
+          "properties": {
+            "mode": {
+              "const": "interactive",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "remote_assist",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "diagnostic_only",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "planned_operation",
+              "type": "string"
+            },
+            "plan_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode",
+            "plan_id"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "RecoverySlotPreference": {
+      "enum": [
+        "auto",
+        "slot_a",
+        "slot_b",
+        "removable"
+      ],
+      "type": "string"
+    },
+    "StorageOp": {
+      "oneOf": [
+        {
+          "properties": {
+            "end_lba": {
+              "format": "uint64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "label": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "op": {
+              "const": "create_partition",
+              "type": "string"
+            },
+            "start_lba": {
+              "format": "uint64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "start_lba",
+            "end_lba",
+            "type_guid"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "new_end_lba": {
+              "format": "uint64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "op": {
+              "const": "resize_partition",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid",
+            "new_end_lba"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "filesystem": {
+              "type": "string"
+            },
+            "label": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "op": {
+              "const": "format_filesystem",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid",
+            "filesystem"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "op": {
+              "const": "delete_partition",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "artifact_sha256": {
+              "type": "string"
+            },
+            "op": {
+              "const": "write_image",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid",
+            "artifact_sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "destination_partition_guid": {
+              "type": "string"
+            },
+            "op": {
+              "const": "clone_partition",
+              "type": "string"
+            },
+            "source_partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "source_partition_guid",
+            "destination_partition_guid"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "StorageOperationPlan": {
+      "properties": {
+        "destructive": {
+          "type": "boolean"
+        },
+        "dry_run_summary": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "expected_partition_table_sha256": {
+          "type": "string"
+        },
+        "operations": {
+          "items": {
+            "$ref": "#/$defs/StorageOp"
+          },
+          "type": "array"
+        },
+        "plan_id": {
+          "type": "string"
+        },
+        "reversible": {
+          "type": "boolean"
+        },
+        "schema_version": {
+          "type": "string"
+        },
+        "target_disk": {
+          "$ref": "#/$defs/DiskIdentity"
+        },
+        "touched_protected_classes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PartitionProtectionClass"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "plan_id",
+        "target_disk",
+        "expected_partition_table_sha256",
+        "operations",
+        "destructive",
+        "reversible",
+        "dry_run_summary"
+      ],
+      "type": "object"
+    },
+    "VerifiedArtifactRef": {
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "source_url_or_path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "filename",
+        "size_bytes",
+        "sha256",
+        "source_url_or_path"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "command_id": {
+      "type": "string"
+    },
+    "device_id": {
+      "type": "string"
+    },
+    "expires_at_unix": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "issued_at_unix": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "issuer_key_id": {
+      "type": "string"
+    },
+    "payload": {
+      "$ref": "#/$defs/CommandPayload"
+    },
+    "required_scope": {
+      "$ref": "#/$defs/AuthScope"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "sequence": {
+      "format": "uint64",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "signature_ed25519_hex": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "command_id",
+    "device_id",
+    "sequence",
+    "issued_at_unix",
+    "expires_at_unix",
+    "required_scope",
+    "issuer_key_id",
+    "payload",
+    "signature_ed25519_hex"
+  ],
+  "title": "CommandEnvelope",
+  "type": "object"
+}

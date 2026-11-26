@@ -1,0 +1,142 @@
+{
+  "$defs": {
+    "ComponentKind": {
+      "enum": [
+        "sbm-uefi",
+        "sbm-core-uki",
+        "sbm-core-sysext",
+        "sbm-as-bootstrap",
+        "sbm-installer",
+        "sbm-server",
+        "sbm-agent",
+        "sbm-catalog"
+      ],
+      "type": "string"
+    },
+    "CpuArch": {
+      "enum": [
+        "x86_64",
+        "aarch64",
+        "ia32",
+        "riscv64"
+      ],
+      "type": "string"
+    },
+    "FirmwarePlatform": {
+      "enum": [
+        "uefi-native",
+        "uefi-uboot",
+        "apple-silicon-m1n1-uboot",
+        "legacy-bios"
+      ],
+      "type": "string"
+    },
+    "ReleaseArtifact": {
+      "properties": {
+        "arch": {
+          "$ref": "#/$defs/CpuArch"
+        },
+        "component": {
+          "$ref": "#/$defs/ComponentKind"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/FirmwarePlatform"
+        },
+        "sbat_generation": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "signature_bundle_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "component",
+        "arch",
+        "platform",
+        "filename",
+        "size_bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "ReleaseChannel": {
+      "enum": [
+        "stable",
+        "lts",
+        "rolling",
+        "beta",
+        "nightly",
+        "testing"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/ReleaseArtifact"
+      },
+      "type": "array"
+    },
+    "channel": {
+      "$ref": "#/$defs/ReleaseChannel"
+    },
+    "git_commit": {
+      "type": "string"
+    },
+    "minimum_protocol_major": {
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "minimum_protocol_minor": {
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "published_at_unix": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "release_version": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_version",
+    "channel",
+    "published_at_unix",
+    "git_commit",
+    "minimum_protocol_major",
+    "minimum_protocol_minor",
+    "artifacts"
+  ],
+  "title": "ReleaseManifest",
+  "type": "object"
+}

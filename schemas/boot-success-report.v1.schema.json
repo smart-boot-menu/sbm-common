@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "BootTargetId": {
+      "description": "Stable, persistent identifier for a boot target (never derived from `/dev/sdX`).",
+      "type": "string"
+    },
+    "ComponentKind": {
+      "enum": [
+        "sbm-uefi",
+        "sbm-core-uki",
+        "sbm-core-sysext",
+        "sbm-as-bootstrap",
+        "sbm-installer",
+        "sbm-server",
+        "sbm-agent",
+        "sbm-catalog"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "attempt_id": {
+      "type": "string"
+    },
+    "confirmed_at_unix": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "confirmed_by": {
+      "$ref": "#/$defs/ComponentKind"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "target_id": {
+      "$ref": "#/$defs/BootTargetId"
+    }
+  },
+  "required": [
+    "schema_version",
+    "attempt_id",
+    "target_id",
+    "confirmed_by",
+    "confirmed_at_unix"
+  ],
+  "title": "BootSuccessReport",
+  "type": "object"
+}

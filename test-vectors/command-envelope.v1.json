@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "command_id": "019a0000-0000-7000-8000-000000000101",
+  "device_id": "dev-qemu-01",
+  "sequence": 1,
+  "issued_at_unix": 1795000000,
+  "expires_at_unix": 1795003600,
+  "required_scope": "boot_select",
+  "issuer_key_id": "sbm-server-ed25519-01",
+  "payload": {
+    "kind": "boot",
+    "action": "boot_target",
+    "target_id": "sbm-core:slot-a",
+    "one_shot": true
+  },
+  "signature_ed25519_hex": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+}

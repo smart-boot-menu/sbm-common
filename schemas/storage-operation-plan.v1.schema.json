@@ -1,0 +1,277 @@
+{
+  "$defs": {
+    "DiskBus": {
+      "enum": [
+        "nvme",
+        "sata",
+        "usb",
+        "virtio",
+        "scsi",
+        "mmc",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "DiskIdentity": {
+      "properties": {
+        "bus": {
+          "$ref": "#/$defs/DiskBus"
+        },
+        "gpt_disk_guid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "logical_sector_size": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "model": {
+          "type": "string"
+        },
+        "read_only": {
+          "default": false,
+          "type": "boolean"
+        },
+        "removable": {
+          "default": false,
+          "type": "boolean"
+        },
+        "serial_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "stable_id": {
+          "type": "string"
+        },
+        "wwn_or_eui64": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "stable_id",
+        "model",
+        "size_bytes",
+        "logical_sector_size",
+        "bus"
+      ],
+      "type": "object"
+    },
+    "PartitionProtectionClass": {
+      "enum": [
+        "normal",
+        "protected_esp",
+        "protected_apple_system",
+        "protected_encrypted",
+        "protected_sbm_recovery"
+      ],
+      "type": "string"
+    },
+    "StorageOp": {
+      "oneOf": [
+        {
+          "properties": {
+            "end_lba": {
+              "format": "uint64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "label": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "op": {
+              "const": "create_partition",
+              "type": "string"
+            },
+            "start_lba": {
+              "format": "uint64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "start_lba",
+            "end_lba",
+            "type_guid"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "new_end_lba": {
+              "format": "uint64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "op": {
+              "const": "resize_partition",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid",
+            "new_end_lba"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "filesystem": {
+              "type": "string"
+            },
+            "label": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "op": {
+              "const": "format_filesystem",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid",
+            "filesystem"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "op": {
+              "const": "delete_partition",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "artifact_sha256": {
+              "type": "string"
+            },
+            "op": {
+              "const": "write_image",
+              "type": "string"
+            },
+            "partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "partition_guid",
+            "artifact_sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "destination_partition_guid": {
+              "type": "string"
+            },
+            "op": {
+              "const": "clone_partition",
+              "type": "string"
+            },
+            "source_partition_guid": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "source_partition_guid",
+            "destination_partition_guid"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "destructive": {
+      "type": "boolean"
+    },
+    "dry_run_summary": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "expected_partition_table_sha256": {
+      "type": "string"
+    },
+    "operations": {
+      "items": {
+        "$ref": "#/$defs/StorageOp"
+      },
+      "type": "array"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "reversible": {
+      "type": "boolean"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "target_disk": {
+      "$ref": "#/$defs/DiskIdentity"
+    },
+    "touched_protected_classes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PartitionProtectionClass"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "plan_id",
+    "target_disk",
+    "expected_partition_table_sha256",
+    "operations",
+    "destructive",
+    "reversible",
+    "dry_run_summary"
+  ],
+  "title": "StorageOperationPlan",
+  "type": "object"
+}

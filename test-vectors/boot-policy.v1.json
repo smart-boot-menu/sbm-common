@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "policy_revision": 1,
+  "default_target": "efi:11111111-2222-3333-4444-555555555555:a1b2c3d4e5f6",
+  "fallback_target": "sbm-core:slot-a",
+  "timeout_seconds": 5,
+  "one_shot": null,
+  "max_failed_attempts": 3,
+  "network_policy_timeout_ms": 3000,
+  "allow_remote_boot_select": false,
+  "offline_behavior": "use_local_policy"
+}

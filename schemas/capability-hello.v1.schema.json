@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "ComponentKind": {
+      "enum": [
+        "sbm-uefi",
+        "sbm-core-uki",
+        "sbm-core-sysext",
+        "sbm-as-bootstrap",
+        "sbm-installer",
+        "sbm-server",
+        "sbm-agent",
+        "sbm-catalog"
+      ],
+      "type": "string"
+    },
+    "ProtocolVersion": {
+      "properties": {
+        "major": {
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "minor": {
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "major",
+        "minor"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "component": {
+      "$ref": "#/$defs/ComponentKind"
+    },
+    "features": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "software_version": {
+      "type": "string"
+    },
+    "supported_protocol_max": {
+      "$ref": "#/$defs/ProtocolVersion"
+    },
+    "supported_protocol_min": {
+      "$ref": "#/$defs/ProtocolVersion"
+    }
+  },
+  "required": [
+    "component",
+    "software_version",
+    "supported_protocol_min",
+    "supported_protocol_max"
+  ],
+  "title": "CapabilityHello",
+  "type": "object"
+}

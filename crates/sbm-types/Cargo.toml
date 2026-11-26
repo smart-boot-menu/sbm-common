@@ -1,0 +1,17 @@
+[package]
+name = "sbm-types"
+description = "Core no_std-compatible Smart Boot Menu domain types, identifiers, storage plans, catalog, and error models"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+default = ["std"]
+std = ["serde/std"]
+schema = ["std", "dep:schemars"]
+
+[dependencies]
+serde.workspace = true
+schemars = { workspace = true, optional = true }

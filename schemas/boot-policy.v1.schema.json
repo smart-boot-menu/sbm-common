@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "BootTargetId": {
+      "description": "Stable, persistent identifier for a boot target (never derived from `/dev/sdX`).",
+      "type": "string"
+    },
+    "OfflineBehavior": {
+      "enum": [
+        "use_local_policy",
+        "wait_for_user"
+      ],
+      "type": "string"
+    },
+    "OneShotBoot": {
+      "properties": {
+        "command_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "consumed": {
+          "default": false,
+          "type": "boolean"
+        },
+        "expires_at_unix": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "target_id": {
+          "$ref": "#/$defs/BootTargetId"
+        }
+      },
+      "required": [
+        "target_id"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "allow_remote_boot_select": {
+      "default": false,
+      "type": "boolean"
+    },
+    "default_target": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BootTargetId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fallback_target": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BootTargetId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "max_failed_attempts": {
+      "format": "uint8",
+      "maximum": 255,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "network_policy_timeout_ms": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "offline_behavior": {
+      "$ref": "#/$defs/OfflineBehavior"
+    },
+    "one_shot": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OneShotBoot"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "policy_revision": {
+      "format": "uint64",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "policy_revision",
+    "timeout_seconds",
+    "max_failed_attempts",
+    "network_policy_timeout_ms",
+    "offline_behavior"
+  ],
+  "title": "BootPolicy",
+  "type": "object"
+}

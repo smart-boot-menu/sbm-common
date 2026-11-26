@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "attempt_id": "019a0000-0000-7000-8000-000000000202",
+  "sbm_uefi_version": "0.1.0-alpha",
+  "platform": {
+    "arch": "aarch64",
+    "firmware": "uefi-native",
+    "page_size_bytes": 4096,
+    "secure_boot_state": "disabled",
+    "tpm_present": true,
+    "nvram_writable": true,
+    "gop_framebuffer": true,
+    "uefi_networking": true,
+    "can_chainload_efi": true,
+    "can_direct_chainload_macos": false,
+    "external_usb_boot_supported": true,
+    "ram_total_mib": 4096
+  },
+  "launch_mode": {
+    "mode": "interactive"
+  },
+  "discovered_targets": [
+    {
+      "id": "sbm-core:slot-a",
+      "display_name": "Smart Boot Menu Recovery (Slot A)",
+      "os_family": "recovery",
+      "kind": "sbm_core",
+      "arch": "aarch64",
+      "efi_path": "\\EFI\\sbm\\recovery\\slot-a\\sbm-core-aarch64.efi",
+      "removable_media": false,
+      "hidden": false
+    }
+  ],
+  "boot_timing_us": {
+    "firmware_init_us": 420000,
+    "uefi_entry_us": 425000,
+    "first_frame_us": 510000,
+    "network_us": 0,
+    "handoff_us": 1200000
+  }
+}

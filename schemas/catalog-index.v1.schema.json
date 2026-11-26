@@ -1,0 +1,228 @@
+{
+  "$defs": {
+    "CatalogArtifact": {
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "mirrors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "sha512": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "upstream_signature_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "user_supplied_only": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "filename",
+        "size_bytes",
+        "sha256",
+        "mirrors"
+      ],
+      "type": "object"
+    },
+    "CpuArch": {
+      "enum": [
+        "x86_64",
+        "aarch64",
+        "ia32",
+        "riscv64"
+      ],
+      "type": "string"
+    },
+    "FirmwarePlatform": {
+      "enum": [
+        "uefi-native",
+        "uefi-uboot",
+        "apple-silicon-m1n1-uboot",
+        "legacy-bios"
+      ],
+      "type": "string"
+    },
+    "InstallStrategy": {
+      "enum": [
+        "direct_installer_boot",
+        "rootfs_image_extract",
+        "bootc_oci",
+        "windows_wim_apply",
+        "bsd_image"
+      ],
+      "type": "string"
+    },
+    "OsCatalogEntry": {
+      "properties": {
+        "homepage_url": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "os_family": {
+          "$ref": "#/$defs/OsFamily"
+        },
+        "releases": {
+          "items": {
+            "$ref": "#/$defs/OsReleaseEntry"
+          },
+          "type": "array"
+        },
+        "schema_version": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "name",
+        "os_family",
+        "vendor",
+        "homepage_url",
+        "releases"
+      ],
+      "type": "object"
+    },
+    "OsFamily": {
+      "enum": [
+        "linux",
+        "windows",
+        "mac_os",
+        "bsd",
+        "recovery",
+        "firmware_utility",
+        "other"
+      ],
+      "type": "string"
+    },
+    "OsReleaseEntry": {
+      "properties": {
+        "architectures": {
+          "items": {
+            "$ref": "#/$defs/CpuArch"
+          },
+          "type": "array"
+        },
+        "artifacts": {
+          "items": {
+            "$ref": "#/$defs/CatalogArtifact"
+          },
+          "type": "array"
+        },
+        "channel": {
+          "$ref": "#/$defs/ReleaseChannel"
+        },
+        "eol_date": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "install_strategy": {
+          "$ref": "#/$defs/InstallStrategy"
+        },
+        "min_disk_gib": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "min_ram_mib": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "recipe_version": {
+          "type": "string"
+        },
+        "supported_platforms": {
+          "items": {
+            "$ref": "#/$defs/FirmwarePlatform"
+          },
+          "type": "array"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "channel",
+        "architectures",
+        "supported_platforms",
+        "min_ram_mib",
+        "min_disk_gib",
+        "install_strategy",
+        "artifacts",
+        "recipe_version"
+      ],
+      "type": "object"
+    },
+    "ReleaseChannel": {
+      "enum": [
+        "stable",
+        "lts",
+        "rolling",
+        "beta",
+        "nightly",
+        "testing"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "catalog_revision": {
+      "format": "uint64",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/OsCatalogEntry"
+      },
+      "type": "array"
+    },
+    "published_at_unix": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "catalog_revision",
+    "published_at_unix",
+    "entries"
+  ],
+  "title": "CatalogIndex",
+  "type": "object"
+}

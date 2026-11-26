@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "id": "fedora-workstation",
+  "name": "Fedora Workstation",
+  "os_family": "linux",
+  "vendor": "Fedora Project",
+  "homepage_url": "https://fedoraproject.org/",
+  "releases": [
+    {
+      "version": "43",
+      "channel": "stable",
+      "architectures": ["x86_64", "aarch64"],
+      "supported_platforms": ["uefi-native"],
+      "min_ram_mib": 2048,
+      "min_disk_gib": 20,
+      "install_strategy": "direct_installer_boot",
+      "artifacts": [
+        {
+          "filename": "Fedora-Workstation-Live-x86_64-43.iso",
+          "size_bytes": 2400000000,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mirrors": ["https://download.fedoraproject.org/pub/fedora/linux/releases/43/Workstation/x86_64/iso/"],
+          "user_supplied_only": false
+        }
+      ],
+      "recipe_version": "1.0"
+    }
+  ]
+}

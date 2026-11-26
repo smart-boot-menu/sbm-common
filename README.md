@@ -7,8 +7,10 @@ Canonical Rust crates, JSON Schemas, and golden protocol test vectors implementi
 | Crate | `no_std` + `alloc`? | Purpose |
 |---|---|---|
 | `sbm-types` | **Yes** (`--no-default-features`) | Identifiers, `PlatformCapabilities`, `BootTarget`, `DiskIdentity`, `StorageOperationPlan`, `OsInstallPlan`, `OsCatalogEntry`, `ReleaseManifest`, `SbmError` |
-| `sbm-protocol` | **Yes** (`--no-default-features`) | `ProtocolVersion` negotiation, `BootPolicy`, `BootCommand`, `BootAttemptRecord`, `EfiHandoffPayload`, `RecoveryManifest`, `EnrollmentRequest/Response`, `AuthScope`, `CommandEnvelope` |
+| `sbm-protocol` | **Yes** (`--no-default-features`) | `ProtocolVersion` negotiation, `BootPolicy`, `BootCommand`, `BootAttemptRecord`, `EfiHandoffPayload`, `RecoveryManifest`, `EnrollmentRequest/Response`, `AuthScope`, `CommandEnvelope`, `command_signing_preimage` |
 | `sbm-schema` | `std` only | Exports 18 canonical JSON Schemas to `schemas/` and validates golden `test-vectors/` |
+
+`command_signing_preimage` is Command Signing Profile v1: `COMMAND_SIGNING_DOMAIN_V1` followed by the compact JSON of every envelope field except `signature_ed25519_hex`. A UEFI verifier and `sbm-server` both call it. `test-vectors/command-signing.v1.json` locks a published test seed (not a production key) and the signatures for boot, recovery, and revoke. `test-vectors/command-envelope.v1.json` is the envelope shape.
 
 ## Release manifest migration
 

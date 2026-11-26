@@ -17,6 +17,9 @@ use schemars::JsonSchema;
 pub const PROTOCOL_V1: ProtocolVersion = ProtocolVersion { major: 1, minor: 0 };
 pub const COMMAND_SIGNING_DOMAIN_V1: &[u8] = b"sbm-cmd-v1\0";
 
+mod canonical;
+pub use canonical::{command_canonical_json, command_signing_preimage};
+
 // ============================================================================
 // 1. Compatibility Negotiation (Spec 07)
 // ============================================================================
@@ -404,6 +407,44 @@ mod tests {
         assert_eq!(
             bad_scope.validate_metadata("dev-01", 4, Some(1_795_000_100), true),
             Err(SbmErrorCode::UnauthorizedScope)
+        );
+    }
+
+    #[test]
+    fn signing_bytes_match_the_published_boot_vector() {
+        let env = CommandEnvelope {
+            schema_version: SCHEMA_VERSION_V1.to_string(),
+            command_id: "019a0000-0000-7000-8000-000000000101".to_string(),
+            device_id: "dev-qemu-01".to_string(),
+            sequence: 1,
+            issued_at_unix: 1_795_000_000,
+            expires_at_unix: 1_795_003_600,
+            required_scope: AuthScope::BootSelect,
+            issuer_key_id: "sbm-server-ed25519-01".to_string(),
+            payload: CommandPayload::Boot(BootCommand::BootTarget {
+                target_id: BootTargetId("sbm-core:slot-a".to_string()),
+                one_shot: true,
+                extra_cmdline_preset: None,
+            }),
+            signature_ed25519_hex: "00".repeat(64),
+        };
+        let json = command_canonical_json(&env).expect("json");
+        assert_eq!(
+            json,
+            concat!(
+                r#"{"schema_version":"1.0","command_id":"019a0000-0000-7000-8000-000000000101","#,
+                r#""device_id":"dev-qemu-01","sequence":1,"issued_at_unix":1795000000,"#,
+                r#""expires_at_unix":1795003600,"required_scope":"boot_select","#,
+                r#""issuer_key_id":"sbm-server-ed25519-01","payload":{"kind":"boot","#,
+                r#""action":"boot_target","target_id":"sbm-core:slot-a","one_shot":true}}"#,
+            )
+            .as_bytes()
+        );
+        let preimage = command_signing_preimage(&env).expect("preimage");
+        assert!(preimage.starts_with(COMMAND_SIGNING_DOMAIN_V1));
+        assert_eq!(
+            &preimage[COMMAND_SIGNING_DOMAIN_V1.len()..],
+            json.as_slice()
         );
     }
 }

@@ -136,8 +136,50 @@ mod tests {
         let handoff: EfiHandoffPayload = serde_json::from_str(&handoff_raw).unwrap();
         assert_eq!(handoff.schema_version, "1.0");
 
+        let recovery_raw = fs::read_to_string(vec_dir.join("recovery-manifest.v1.json")).unwrap();
+        let recovery: RecoveryManifest = serde_json::from_str(&recovery_raw).unwrap();
+        assert_eq!(recovery.schema_version, "1.0");
+        assert_eq!(recovery.slots.len(), 2);
+        assert!(
+            recovery
+                .slots
+                .iter()
+                .all(|slot| slot.slot_name == recovery.active_slot)
+        );
+        assert_eq!(
+            serde_json::to_value(&recovery).unwrap(),
+            serde_json::from_str::<serde_json::Value>(&recovery_raw).unwrap()
+        );
+
         let cat_raw = fs::read_to_string(vec_dir.join("os-catalog-entry.v1.json")).unwrap();
         let cat: OsCatalogEntry = serde_json::from_str(&cat_raw).unwrap();
         assert_eq!(cat.id, "fedora-workstation");
+    }
+
+    #[test]
+    fn release_manifest_media_preserves_v1_compatibility() {
+        use sbm_types::{CpuArch, RELEASE_MANIFEST_SCHEMA_VERSION_V1_1, SCHEMA_VERSION_V1};
+
+        let sample = include_str!("../../../test-vectors/release-manifest.v1.1.json");
+        let manifest: ReleaseManifest = serde_json::from_str(sample).unwrap();
+        assert_eq!(
+            manifest.schema_version,
+            RELEASE_MANIFEST_SCHEMA_VERSION_V1_1
+        );
+        assert_eq!(manifest.media.len(), 2);
+        for media in &manifest.media {
+            assert_eq!(media.architectures, [CpuArch::X86_64, CpuArch::Aarch64]);
+        }
+        assert_eq!(
+            serde_json::to_value(&manifest).unwrap(),
+            serde_json::from_str::<serde_json::Value>(sample).unwrap()
+        );
+
+        let mut legacy = serde_json::to_value(&manifest).unwrap();
+        legacy["schema_version"] = SCHEMA_VERSION_V1.into();
+        legacy.as_object_mut().unwrap().remove("media");
+        let manifest: ReleaseManifest = serde_json::from_value(legacy.clone()).unwrap();
+        assert!(manifest.media.is_empty());
+        assert_eq!(serde_json::to_value(&manifest).unwrap(), legacy);
     }
 }

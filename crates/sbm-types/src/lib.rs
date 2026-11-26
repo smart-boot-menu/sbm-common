@@ -13,6 +13,9 @@ use schemars::JsonSchema;
 /// Current canonical schema version string for v1 documents.
 pub const SCHEMA_VERSION_V1: &str = "1.0";
 
+/// Release manifest version that introduces combined boot media.
+pub const RELEASE_MANIFEST_SCHEMA_VERSION_V1_1: &str = "1.1";
+
 // ============================================================================
 // 1. CPU Architecture, Firmware Platform & Capabilities (Spec 01)
 // ============================================================================
@@ -395,6 +398,15 @@ pub struct ReleaseArtifact {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
+pub struct ReleaseMedia {
+    pub filename: String,
+    pub size_bytes: u64,
+    pub sha256: String,
+    pub architectures: Vec<CpuArch>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
 pub struct ReleaseManifest {
     pub schema_version: String,
     pub release_version: String,
@@ -404,6 +416,8 @@ pub struct ReleaseManifest {
     pub minimum_protocol_major: u16,
     pub minimum_protocol_minor: u16,
     pub artifacts: Vec<ReleaseArtifact>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub media: Vec<ReleaseMedia>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]

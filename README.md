@@ -10,6 +10,10 @@ Canonical Rust crates, JSON Schemas, and golden protocol test vectors implementi
 | `sbm-protocol` | **Yes** (`--no-default-features`) | `ProtocolVersion` negotiation, `BootPolicy`, `BootCommand`, `BootAttemptRecord`, `EfiHandoffPayload`, `RecoveryManifest`, `EnrollmentRequest/Response`, `AuthScope`, `CommandEnvelope` |
 | `sbm-schema` | `std` only | Exports 18 canonical JSON Schemas to `schemas/` and validates golden `test-vectors/` |
 
+## Release manifest migration
+
+`ReleaseManifest.media` defaults to an empty vector when reading existing 1.0 JSON. Follow Spec 07 and use `RELEASE_MANIFEST_SCHEMA_VERSION_V1_1` when producing media entries. Update Rust struct literals to include the new field. Consumers that distribute combined media must explicitly accept 1.1 and validate the media metadata. The schema file retains its v1 family name. Recovery, handoff, and command-envelope wire versions stay at 1.0.
+
 ## Verification Commands
 
 ```bash

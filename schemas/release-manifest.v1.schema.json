@@ -88,6 +88,34 @@
         "testing"
       ],
       "type": "string"
+    },
+    "ReleaseMedia": {
+      "properties": {
+        "architectures": {
+          "items": {
+            "$ref": "#/$defs/CpuArch"
+          },
+          "type": "array"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "filename",
+        "size_bytes",
+        "sha256",
+        "architectures"
+      ],
+      "type": "object"
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -103,6 +131,12 @@
     },
     "git_commit": {
       "type": "string"
+    },
+    "media": {
+      "items": {
+        "$ref": "#/$defs/ReleaseMedia"
+      },
+      "type": "array"
     },
     "minimum_protocol_major": {
       "format": "uint16",

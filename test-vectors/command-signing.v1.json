@@ -1,0 +1,24 @@
+{
+  "profile": "command-signing-v1",
+  "note": "The seed is a published test key. It is not a production command key.",
+  "seed_hex": "1111111111111111111111111111111111111111111111111111111111111111",
+  "public_key_hex": "d04ab232742bb4ab3a1368bd4615e4e6d0224ab71a016baf8520a332c9778737",
+  "domain_hex": "73626d2d636d642d763100",
+  "cases": [
+    {
+      "name": "boot_target",
+      "canonical_json": "{\"schema_version\":\"1.0\",\"command_id\":\"019a0000-0000-7000-8000-000000000101\",\"device_id\":\"dev-qemu-01\",\"sequence\":1,\"issued_at_unix\":1795000000,\"expires_at_unix\":1795003600,\"required_scope\":\"boot_select\",\"issuer_key_id\":\"sbm-server-ed25519-01\",\"payload\":{\"kind\":\"boot\",\"action\":\"boot_target\",\"target_id\":\"sbm-core:slot-a\",\"one_shot\":true}}",
+      "signature_ed25519_hex": "a2a54238e90953ed32171c6fefcfd5e237b4e2ccafd877565ed750959b193b109ecfe62796097234c82e6d3198ca297ed71bddadfb332c07b218165f5f5a060f"
+    },
+    {
+      "name": "boot_recovery",
+      "canonical_json": "{\"schema_version\":\"1.0\",\"command_id\":\"recovery\",\"device_id\":\"dev-qemu-01\",\"sequence\":1,\"issued_at_unix\":1795000000,\"expires_at_unix\":1795003600,\"required_scope\":\"recovery_access\",\"issuer_key_id\":\"sbm-server-ed25519-01\",\"payload\":{\"kind\":\"boot\",\"action\":\"boot_recovery\",\"slot\":\"slot_a\",\"launch_mode\":{\"mode\":\"planned_operation\",\"plan_id\":\"plan \\\"a\\\"\\n\\u0001β\"}}}",
+      "signature_ed25519_hex": "f9e593b10f6b53785e7469c1bccafded71ef7a9306425fdd443c4747a9fa758db460edada999839ad9e06a5ef0bbb42a7c19c6589ea3af81c3dc76494800ff05"
+    },
+    {
+      "name": "revoke_enrollment",
+      "canonical_json": "{\"schema_version\":\"1.0\",\"command_id\":\"revoke\",\"device_id\":\"dev-qemu-01\",\"sequence\":1,\"issued_at_unix\":1795000000,\"expires_at_unix\":1795003600,\"required_scope\":\"admin\",\"issuer_key_id\":\"sbm-server-ed25519-01\",\"payload\":{\"kind\":\"revoke_enrollment\",\"reason\":\"operator said \\\"stop\\\"\"}}",
+      "signature_ed25519_hex": "4ed1099ff504c0b0b97433d48d2d5e4e18a39cf21112189d15932da07b600ddc16bbe4e0549afee8eaf882e4af4774016645e4b0f79ae774ecb6700dbbde6509"
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "$defs": {
+    "BootCommand": {
+      "oneOf": [
+        {
+          "properties": {
+            "action": {
+              "const": "boot_target",
+              "type": "string"
+            },
+            "extra_cmdline_preset": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "one_shot": {
+              "type": "boolean"
+            },
+            "target_id": {
+              "$ref": "#/$defs/BootTargetId"
+            }
+          },
+          "required": [
+            "action",
+            "target_id",
+            "one_shot"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "boot_recovery",
+              "type": "string"
+            },
+            "launch_mode": {
+              "$ref": "#/$defs/RecoveryLaunchMode"
+            },
+            "slot": {
+              "$ref": "#/$defs/RecoverySlotPreference"
+            }
+          },
+          "required": [
+            "action",
+            "slot",
+            "launch_mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "reboot_to_firmware_setup",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "reboot",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "action": {
+              "const": "shutdown",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "BootTargetId": {
+      "description": "Stable, persistent identifier for a boot target (never derived from `/dev/sdX`).",
+      "type": "string"
+    },
+    "ComponentKind": {
+      "enum": [
+        "sbm-uefi",
+        "sbm-core-uki",
+        "sbm-core-sysext",
+        "sbm-as-bootstrap",
+        "sbm-installer",
+        "sbm-server",
+        "sbm-agent",
+        "sbm-catalog"
+      ],
+      "type": "string"
+    },
+    "RecoveryLaunchMode": {
+      "oneOf": [
+        {
+          "properties": {
+            "mode": {
+              "const": "interactive",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "remote_assist",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "diagnostic_only",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "planned_operation",
+              "type": "string"
+            },
+            "plan_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode",
+            "plan_id"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "RecoverySlotPreference": {
+      "enum": [
+        "auto",
+        "slot_a",
+        "slot_b",
+        "removable"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A one-shot boot request that SBM Core writes to\n`\\EFI\\sbm\\handoff\\requested-command.json` on the boot ESP for the next\npicker start (Spec 02 §5a).\n\nThe request is bound to the recovery attempt Core ran under. The picker\nhonours it only when `attempt_id` names its current confirmed\n`sbm-core:slot-a` attempt and the target is one it can launch now. It\ndeletes the file before acting, so a request is never replayed.",
+  "properties": {
+    "attempt_id": {
+      "description": "`attempt_id` of the verified handoff of the Core session that wrote it.",
+      "type": "string"
+    },
+    "command": {
+      "$ref": "#/$defs/BootCommand",
+      "description": "0.0.1 accepts only `BootTarget` with `one_shot = true`."
+    },
+    "request_id": {
+      "description": "Fresh UUIDv4 for this request.",
+      "type": "string"
+    },
+    "requested_at_unix": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "requested_by": {
+      "$ref": "#/$defs/ComponentKind"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "request_id",
+    "attempt_id",
+    "requested_by",
+    "requested_at_unix",
+    "command"
+  ],
+  "title": "LocalBootRequest",
+  "type": "object"
+}

@@ -2,7 +2,7 @@
 
 use sbm_protocol::{
     BootAttemptRecord, BootPolicy, BootSuccessReport, CapabilityHello, CommandEnvelope,
-    EfiHandoffPayload, EnrollmentRequest, EnrollmentResponse, RecoveryManifest,
+    EfiHandoffPayload, EnrollmentRequest, EnrollmentResponse, LocalBootRequest, RecoveryManifest,
 };
 use sbm_types::{
     BootTarget, CatalogIndex, DiagnosticBundle, OsCatalogEntry, OsInstallPlan,
@@ -42,6 +42,10 @@ pub fn all_schemas() -> Vec<NamedSchema> {
         NamedSchema {
             filename: "efi-handoff.v1.schema.json",
             schema: serde_json::to_value(schema_for!(EfiHandoffPayload)).unwrap(),
+        },
+        NamedSchema {
+            filename: "local-boot-request.v1.schema.json",
+            schema: serde_json::to_value(schema_for!(LocalBootRequest)).unwrap(),
         },
         NamedSchema {
             filename: "recovery-manifest.v1.schema.json",
@@ -103,7 +107,7 @@ mod tests {
     #[test]
     fn all_schemas_are_valid_json_objects() {
         let schemas = all_schemas();
-        assert_eq!(schemas.len(), 18);
+        assert_eq!(schemas.len(), 19);
         for s in schemas {
             assert!(s.schema.is_object(), "{} must be a JSON object", s.filename);
             assert!(
@@ -135,6 +139,38 @@ mod tests {
         let handoff_raw = fs::read_to_string(vec_dir.join("efi-handoff.v1.json")).unwrap();
         let handoff: EfiHandoffPayload = serde_json::from_str(&handoff_raw).unwrap();
         assert_eq!(handoff.schema_version, "1.0");
+        assert!(sbm_protocol::is_uuid_v4(&handoff.attempt_id));
+        assert!(handoff.discovered_targets.iter().all(|t| t.id.is_valid()));
+        assert_eq!(
+            serde_json::to_value(&handoff).unwrap(),
+            serde_json::from_str::<serde_json::Value>(&handoff_raw).unwrap()
+        );
+
+        let request_raw = fs::read_to_string(vec_dir.join("local-boot-request.v1.json")).unwrap();
+        let request: LocalBootRequest = serde_json::from_str(&request_raw).unwrap();
+        assert_eq!(request.schema_version, "1.0");
+        assert!(sbm_protocol::is_uuid_v4(&request.request_id));
+        assert_eq!(request.attempt_id, handoff.attempt_id);
+        assert_eq!(request.requested_by, sbm_types::ComponentKind::SbmCoreUki);
+        let sbm_protocol::BootCommand::BootTarget {
+            target_id,
+            one_shot,
+            ..
+        } = &request.command
+        else {
+            panic!("0.0.1 local requests carry boot_target");
+        };
+        assert!(*one_shot);
+        assert!(
+            handoff
+                .discovered_targets
+                .iter()
+                .any(|target| &target.id == target_id)
+        );
+        assert_eq!(
+            serde_json::to_value(&request).unwrap(),
+            serde_json::from_str::<serde_json::Value>(&request_raw).unwrap()
+        );
 
         let recovery_raw = fs::read_to_string(vec_dir.join("recovery-manifest.v1.json")).unwrap();
         let recovery: RecoveryManifest = serde_json::from_str(&recovery_raw).unwrap();

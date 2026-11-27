@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "request_id": "2b3c4d5e-6f70-4182-9a3b-4c5d6e7f8091",
+  "attempt_id": "6f1c2b9e-3d4a-4e5f-8a7b-0c1d2e3f4a5b",
+  "requested_by": "sbm-core-uki",
+  "requested_at_unix": 1795000000,
+  "command": {
+    "action": "boot_target",
+    "target_id": "bls:00000000-0000-4000-8000-0000000000e5:fedora-6.16",
+    "one_shot": true
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "attempt_id": "019a0000-0000-7000-8000-000000000202",
+  "attempt_id": "6f1c2b9e-3d4a-4e5f-8a7b-0c1d2e3f4a5b",
   "sbm_uefi_version": "0.1.0-alpha",
   "platform": {
     "arch": "aarch64",
@@ -21,11 +21,48 @@
   },
   "discovered_targets": [
     {
+      "id": "bls:00000000-0000-4000-8000-0000000000e5:fedora-6.17",
+      "display_name": "Fedora Linux 43 (6.17)",
+      "os_family": "linux",
+      "kind": "bls_uki",
+      "arch": "aarch64",
+      "partition_guid": "00000000-0000-4000-8000-0000000000e5",
+      "efi_path": "\\EFI\\Linux\\fedora-6.17.efi",
+      "icon_hint": "linux",
+      "removable_media": false,
+      "hidden": false
+    },
+    {
+      "id": "bls:00000000-0000-4000-8000-0000000000e5:fedora-6.16",
+      "display_name": "Fedora Linux 43 (6.16)",
+      "os_family": "linux",
+      "kind": "bls_uki",
+      "arch": "aarch64",
+      "partition_guid": "00000000-0000-4000-8000-0000000000e5",
+      "efi_path": "\\EFI\\Linux\\fedora-6.16.efi",
+      "icon_hint": "linux",
+      "removable_media": false,
+      "hidden": false
+    },
+    {
+      "id": "efi:00000000-0000-4000-8000-0000000000e5:3f9a1c0b7d2e",
+      "display_name": "Windows",
+      "os_family": "windows",
+      "kind": "efi_binary",
+      "arch": "aarch64",
+      "partition_guid": "00000000-0000-4000-8000-0000000000e5",
+      "efi_path": "\\EFI\\Microsoft\\Boot\\bootmgfw.efi",
+      "icon_hint": "windows",
+      "removable_media": false,
+      "hidden": false
+    },
+    {
       "id": "sbm-core:slot-a",
       "display_name": "Smart Boot Menu Recovery (Slot A)",
       "os_family": "recovery",
       "kind": "sbm_core",
       "arch": "aarch64",
+      "partition_guid": "00000000-0000-4000-8000-0000000000e5",
       "efi_path": "\\EFI\\sbm\\recovery\\slot-a\\sbm-core-aarch64.efi",
       "removable_media": false,
       "hidden": false

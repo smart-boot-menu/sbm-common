@@ -183,6 +183,59 @@ pub struct BootSuccessReport {
     pub confirmed_at_unix: i64,
 }
 
+/// A one-shot boot request that SBM Core writes to
+/// `\EFI\sbm\handoff\requested-command.json` on the boot ESP for the next
+/// picker start (Spec 02 §5a).
+///
+/// The request is bound to the recovery attempt Core ran under. The picker
+/// honours it only when `attempt_id` names its current confirmed
+/// `sbm-core:slot-a` attempt and the target is one it can launch now. It
+/// deletes the file before acting, so a request is never replayed.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+pub struct LocalBootRequest {
+    pub schema_version: String,
+    /// Fresh UUIDv4 for this request.
+    pub request_id: String,
+    /// `attempt_id` of the verified handoff of the Core session that wrote it.
+    pub attempt_id: String,
+    pub requested_by: ComponentKind,
+    pub requested_at_unix: i64,
+    /// 0.0.1 accepts only `BootTarget` with `one_shot = true`.
+    pub command: BootCommand,
+}
+
+/// Format 16 random bytes as an RFC 9562 version 4 UUID (lowercase).
+pub fn format_uuid_v4(mut bytes: [u8; 16]) -> String {
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut out = String::with_capacity(36);
+    for (index, byte) in bytes.iter().enumerate() {
+        if matches!(index, 4 | 6 | 8 | 10) {
+            out.push('-');
+        }
+        out.push(HEX[usize::from(byte >> 4)] as char);
+        out.push(HEX[usize::from(byte & 0x0f)] as char);
+    }
+    out
+}
+
+/// True for a lowercase or uppercase RFC 9562 version 4 UUID string.
+pub fn is_uuid_v4(text: &str) -> bool {
+    let bytes = text.as_bytes();
+    if bytes.len() != 36 {
+        return false;
+    }
+    for (index, byte) in bytes.iter().enumerate() {
+        let dash = matches!(index, 8 | 13 | 18 | 23);
+        if dash != (*byte == b'-') || (!dash && !byte.is_ascii_hexdigit()) {
+            return false;
+        }
+    }
+    bytes[14] == b'4' && matches!(bytes[19], b'8' | b'9' | b'a' | b'b' | b'A' | b'B')
+}
+
 // ============================================================================
 // 3. EFI-to-Linux Handoff & Recovery Discovery (Spec 03)
 // ============================================================================
@@ -352,6 +405,21 @@ mod tests {
     use super::*;
     use alloc::string::ToString;
     use sbm_types::SCHEMA_VERSION_V1;
+
+    #[test]
+    fn uuid_v4_formatting_sets_version_and_variant() {
+        let id = format_uuid_v4([0xff; 16]);
+        assert_eq!(id, "ffffffff-ffff-4fff-bfff-ffffffffffff");
+        assert!(is_uuid_v4(&id));
+        let id = format_uuid_v4([0; 16]);
+        assert_eq!(id, "00000000-0000-4000-8000-000000000000");
+        assert!(is_uuid_v4(&id));
+        assert!(!is_uuid_v4("uefi-1727508"));
+        assert!(!is_uuid_v4("local"));
+        assert!(!is_uuid_v4("019a0000-0000-7000-8000-000000000202"));
+        assert!(!is_uuid_v4("00000000-0000-4000-c000-000000000000"));
+        assert!(!is_uuid_v4("00000000x0000-4000-8000-000000000000"));
+    }
 
     #[test]
     fn protocol_negotiation_works() {
